@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>JS test</title>
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
+      integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
+      crossorigin="anonymous"
+    />
+    <script
+      src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+      integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"
+      integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"
+      integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
+      crossorigin="anonymous"
+    ></script>
+
+    <script>
+      function getData() {
+        // const a = {
+        //   someKey: 123,
+        //   "other key": "value",
+        //   lastKey: false,
+        //   nested: {
+        //     v: [1, false, "string"]
+        //   }
+        // };
+
+        // const json_text = JSON.stringify(a);
+        // console.log(json_text);
+        const city = document.getElementById("city-search").value;
+        if (city.trim() !== "") {
+          fetch(
+            "https://developers.zomato.com/api/v2.1/locations?query=" + city,
+            {
+              method: "GET", // or "PUT"
+              headers: {
+                "user-key": "8ab2591c8220028622a5d46a7a3198a5"
+              }
+            }
+          )
+            .then((r) => r.json())
+            .then((r) => {
+              console.log(r);
+              const locationFound = r.location_suggestions.length > 0;
+              const location = locationFound
+                ? r.location_suggestions[0]
+                : {
+                    entity_type: "",
+                    title: "Not Found",
+                    city_name: "For query " + city,
+                    country_name: ""
+                  };
+              document.getElementById("city-title").innerText = location.title;
+              document.getElementById("city-name").innerText =
+                location.city_name;
+              document.getElementById("entity-type").innerText =
+                location.entity_type;
+
+              const mapLink = document.getElementById("map-link");
+              if (locationFound) {
+                mapLink.classList.remove("hide");
+                mapLink.href =
+                  "https://www.google.com/maps/@?api=1&map_action=map&center=" +
+                  location.latitude +
+                  "," +
+                  location.longitude;
+              } else {
+                mapLink.classList.add("hide");
+              }
+            });
+        }
+      }
+    </script>
+    <style>
+      .hide {
+        display: none;
+        /* visibility: hidden */
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <nav class="navbar navbar-light bg-light">
+        <a class="navbar-brand" href="#">TomatoNS</a>
+        <form class="form-inline">
+          <input
+            class="form-control mr-sm-2"
+            type="search"
+            id="city-search"
+            placeholder="city"
+            aria-label="Search"
+          />
+          <button
+            onClick="getData()"
+            class="btn btn-outline-success my-2 my-sm-0"
+            type="button"
+          >
+            Search
+          </button>
+        </form>
+      </nav>
+      <div class="row">
+        <div class="col py-3">
+          <div class="card mx-auto" style="width: 18rem;">
+            <div class="card-body">
+              <h5 class="card-title" id="city-title"></h5>
+              <h6 class="card-subtitle mb-2 text-muted" id="city-name"></h6>
+              <p class="card-text" id="entity-type"></p>
+              <a
+                href="#"
+                class="btn btn-primary hide"
+                id="map-link"
+                target="_blank"
+                >Go To Map Location</a
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
