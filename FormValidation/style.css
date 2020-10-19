@@ -1,0 +1,8 @@
+
+.success input {
+   border:solid 10px green;
+}
+
+.error input {
+    border:solid 10px red;
+}
